@@ -1,0 +1,2 @@
+UIManager uiManager = FindFirstObjectByType<UIManager>();
+uiManager.ShowStatus("Your journey has begun!", 5f);

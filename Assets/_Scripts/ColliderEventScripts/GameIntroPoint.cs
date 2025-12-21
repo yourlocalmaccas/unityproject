@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class GameIntroPoint : MonoBehaviour
 {
-    public DoorInteract door; 
+
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && door != null && door.isUnlocked)
+        if (other.CompareTag("Player"))
         {
             UIManager uiManager = FindFirstObjectByType<UIManager>();
             if (uiManager != null)

@@ -18,12 +18,11 @@ public class UIManager : MonoBehaviour
     }
 
     public void ShowStatus(string message, float stayDuration)
-{
-    Debug.Log("ShowStatus called with message: " + message);
-    StopAllCoroutines();
-    StartCoroutine(TypeText(message, stayDuration));
-}
-
+    {
+        Debug.Log("ShowStatus called with message: " + message);
+        StopAllCoroutines();
+        StartCoroutine(TypeText(message, stayDuration));
+    }
 
     private IEnumerator TypeText(string message, float stayDuration)
     {
@@ -31,12 +30,15 @@ public class UIManager : MonoBehaviour
             textBackground.SetActive(true);
 
         if (statusText != null)
-            statusText.text = "";
+        {
+            statusText.text = message;
+            statusText.maxVisibleCharacters = 0;
+        }
 
-        foreach (char letter in message.ToCharArray())
+        for (int i = 0; i <= message.Length; i++)
         {
             if (statusText != null)
-                statusText.text += letter;
+                statusText.maxVisibleCharacters = i;
 
             yield return new WaitForSeconds(typingSpeed);
         }

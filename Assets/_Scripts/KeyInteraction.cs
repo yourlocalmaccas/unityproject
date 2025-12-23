@@ -2,22 +2,31 @@ using UnityEngine;
 
 public class KeyInteraction : MonoBehaviour, IInteractable
 {
+    public GameObject flashlightToEnable;
+    public GameObject wallColliderToDestroy;
+
     public void OnInteract()
     {
-        Player player = Player.Instance;
-        
-        if (player == null)
+    
+        if (CursorImage.instance != null)
         {
-            Debug.LogError("Player instance not found!");
-            return;
+            CursorImage.instance.gameObject.SetActive(false);
+            Debug.Log("Cursor Off");
         }
 
-        print("Found player: " + player.name);
-        
-       
-        player.hasKey = true;
-        print("Player picked up key!");
-        
+        if (flashlightToEnable != null)
+        {
+            flashlightToEnable.SetActive(true);
+            Debug.Log("Flashlight On");
+        }
+
+        if (wallColliderToDestroy != null)
+        {
+            Destroy(wallColliderToDestroy);
+        }
+
+        GameManager.Instance.coinCounter++;
+        print ("Key(s): " + GameManager.Instance.coinCounter);
         Destroy(gameObject);
     }
 }

@@ -3,6 +3,18 @@ using UnityEngine.UI;
 
 public class CursorImage : MonoBehaviour
 {
+    public static CursorImage instance;
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
     [SerializeField] private Image cursorImage;
     [SerializeField] private Sprite normalSprite;
     [SerializeField] private Sprite interactSprite;
@@ -10,6 +22,12 @@ public class CursorImage : MonoBehaviour
     [SerializeField] private float rayDistance = 5f;
 
     [HideInInspector] public GameObject currentTarget;
+
+
+    void Start()
+    {
+        gameObject.SetActive(false);
+    }
 
     void Update()
     {

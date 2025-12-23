@@ -15,14 +15,4 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
-    private void Update()
-    {
-        if (coinCounter >= 3 && !wonGame)
-        {
-            wonGame = true;
-            Debug.Log("You Win!");
-            SceneManager.LoadScene("EndScene");
-        }
-    }
 }

@@ -15,5 +15,14 @@ public class CursorCollidePoint : MonoBehaviour
         }
     }
 
-    
+    private void OnTriggerExit(Collider other) 
+    {
+        if (other.CompareTag("Player"))
+        {
+            CursorImage.instance.gameObject.SetActive(false);
+            Debug.Log("Cursor off");
+            Flashlight.gameObject.SetActive(true);
+            Debug.Log("Flashlight on");
+        }
+    }
 }

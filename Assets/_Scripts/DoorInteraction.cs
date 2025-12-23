@@ -1,11 +1,13 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class DoorInteract : MonoBehaviour, IInteractable
 {
-    [Header("Door Settings")]
-    public bool requiresKey = true;
-    public bool isUnlocked = false;
-    public bool isOpen = false;
+    [Header("Settings")]
+    public string nextSceneName = "EndScene"; 
+    private bool isUnlocked = false;
+    private bool isOpen = false;
 
     [Header("References")]
     public Animator animator;
@@ -13,44 +15,48 @@ public class DoorInteract : MonoBehaviour, IInteractable
     public AudioClip lockClip;
     public AudioClip unlockClip;
     public AudioClip openClip;
-    public AudioClip closeClip;
 
     public void OnInteract()
     {
-        Player player = Player.Instance;
-
-        if (player == null) return;
-
-        if (requiresKey && !isUnlocked)
+        if (GameManager.Instance.coinCounter < 3)
         {
-            if (player.hasKey)
-            {
-                isUnlocked = true;
-                audioSource.PlayOneShot(unlockClip);
-                Debug.Log("Door unlocked!");
-            }
-            else
-            {
-                animator.SetTrigger("Locked");
-                audioSource.PlayOneShot(lockClip);
-                Debug.Log("Door is locked");
-                return;
-            }
+            if(animator) animator.SetTrigger("Locked");
+            if(audioSource) audioSource.PlayOneShot(lockClip);
+            
+            NotificationSystem.Instance.ShowNotification("The door is locked. Find 3 keys.", 3f);
+            return; 
         }
 
-        if (!isOpen && isUnlocked)
+        if (!isUnlocked)
         {
-            animator.SetTrigger("OpenDoor");
-            audioSource.PlayOneShot(openClip);
+            isUnlocked = true;
+            if(audioSource) audioSource.PlayOneShot(unlockClip);
+            return; 
+        }
+
+        if (!isOpen)
+        {
             isOpen = true;
-            Debug.Log("Door opened");
-        }
-        else
-        {
-            animator.SetTrigger("CloseDoor");
-            audioSource.PlayOneShot(closeClip);
-            isOpen = false;
-            Debug.Log("Door closed");
+            if(animator) animator.SetTrigger("OpenDoor");
+            if(audioSource) audioSource.PlayOneShot(openClip);
+            
+            StartCoroutine(WinSequence());
         }
     }
+
+    private IEnumerator WinSequence()
+{
+    // 1. Wait just enough time for the door to finish swinging open
+    // (Adjust 1.0f to match the length of your animation)
+    yield return new WaitForSeconds(1.0f);
+
+    if (animator != null)
+    {
+        animator.enabled = false;
+        Debug.Log("Animator disabled to keep door open.");
+    }
+
+    yield return new WaitForSeconds(4.0f);
+    SceneManager.LoadScene(nextSceneName);
+}
 }

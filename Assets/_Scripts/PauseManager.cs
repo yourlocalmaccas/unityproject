@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 public class PauseManager : MonoBehaviour
 {
@@ -11,7 +13,7 @@ public class PauseManager : MonoBehaviour
 
     void Start()
     {
-        settingsPanel.SetActive(false);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
         if (sensSlider != null)
         {
             sensSlider.minValue = 0.1f;
@@ -22,31 +24,29 @@ public class PauseManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            TogglePause();
-        }
+        if (SceneManager.GetActiveScene().name == "StartScene") return;
+        if (Input.GetKeyDown(KeyCode.Escape)) TogglePause();
     }
 
     public void TogglePause()
     {
         isPaused = !isPaused;
-        settingsPanel.SetActive(isPaused);
+        if (settingsPanel != null) settingsPanel.SetActive(isPaused);
 
         if (isPaused)
         {
             Time.timeScale = 0f;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-
             KeyBindButton[] rebindButtons = settingsPanel.GetComponentsInChildren<KeyBindButton>();
             foreach(var btn in rebindButtons) btn.RefreshUI();
         }
         else
         {
             Time.timeScale = 1f;
-            Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            EventSystem.current.SetSelectedGameObject(null);
         }
     }
 
@@ -79,5 +79,11 @@ public class PauseManager : MonoBehaviour
     {
         Screen.fullScreen = isFullscreen;
         PlayerPrefs.SetInt("Fullscreen", isFullscreen ? 1 : 0);
+    }
+
+    public void OnQuitButton()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("StartScene");
     }
 }

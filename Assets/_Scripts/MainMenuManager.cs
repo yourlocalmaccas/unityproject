@@ -6,13 +6,25 @@ using TMPro;
 public class MainMenuManager : MonoBehaviour
 {
     public GameObject settingsPanel;
+    public GameObject mainPanel;
     public Slider sensSlider;
     public TMP_Text sensValueText;
-    private bool isPaused = false;
 
     private void Start()
     {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        Time.timeScale = 1f;
+
         if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (mainPanel != null) mainPanel.SetActive(true);
+        
+        if (sensSlider != null)
+        {
+            sensSlider.minValue = 0.1f;
+            sensSlider.maxValue = 3.0f;
+        }
+        
         LoadSettings();
     }
 
@@ -26,30 +38,53 @@ public class MainMenuManager : MonoBehaviour
         Screen.fullScreen = PlayerPrefs.GetInt("Fullscreen", 1) == 1;
     }
 
+    public void OpenSettings()
+    {
+        if (settingsPanel != null)
+        {
+            settingsPanel.SetActive(true);
+            if (mainPanel != null) mainPanel.SetActive(false);
+
+            KeyBindButton[] rebindButtons = settingsPanel.GetComponentsInChildren<KeyBindButton>();
+            foreach (var btn in rebindButtons) btn.RefreshUI();
+        }
+    }
+
+    public void CloseSettings()
+    {
+        if (settingsPanel != null)
+        {
+            settingsPanel.SetActive(false);
+            if (mainPanel != null) mainPanel.SetActive(true);
+        }
+    }
+
+    public void OnPlayButton()
+    {
+        SceneManager.LoadScene("MainScene");
+    }
+
+    public void OnQuitButton()
+    {
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #else
+        Application.Quit();
+        #endif
+    }
+    private void Awake()
+{
+    Cursor.lockState = CursorLockMode.None;
+    Cursor.visible = true;
+}
     public void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            TogglePause();
-        }
-    }
-
-    public void TogglePause()
-    {
-        isPaused = !isPaused;
-        settingsPanel.SetActive(isPaused);
-
-        if (isPaused)
-        {
-            Time.timeScale = 0f;
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
-        else
-        {
-            Time.timeScale = 1f;
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            if (settingsPanel != null && settingsPanel.activeSelf)
+            {
+                CloseSettings();
+            }
         }
     }
 
@@ -73,10 +108,5 @@ public class MainMenuManager : MonoBehaviour
         PlayerPrefs.SetFloat("MouseSensitivity", roundedValue);
         if (sensValueText != null) sensValueText.text = roundedValue.ToString("F1");
         PlayerPrefs.Save();
-        
-        if(Player.Instance != null)
-        {
-            Player.Instance.UpdateSensitivity(roundedValue);
-        }
     }
 }

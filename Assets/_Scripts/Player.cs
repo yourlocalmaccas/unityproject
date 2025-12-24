@@ -25,6 +25,12 @@ public class Player : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        // Load saved sensitivity from PlayerPrefs if it exists
+        if (PlayerPrefs.HasKey("MouseSensitivity"))
+        {
+            lookSpeed = PlayerPrefs.GetFloat("MouseSensitivity");
+        }
     }
 
     void Update()
@@ -55,9 +61,13 @@ public class Player : MonoBehaviour
         transform.Rotate(Vector3.up * mouseX);
     }
 
+    public void UpdateSensitivity(float newSens)
+{
+    lookSpeed = newSens;
+}
     void HandleInteraction()
     {
-        if (cursorScript.currentTarget != null && Input.GetKeyDown(KeyCode.E))
+        if (cursorScript.currentTarget != null && Input.GetKeyDown(KeybindManager.Instance.Interact))
         {
             IInteractable interactable = cursorScript.currentTarget.GetComponent<IInteractable>();
             if (interactable != null)

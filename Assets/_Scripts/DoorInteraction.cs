@@ -46,8 +46,7 @@ public class DoorInteract : MonoBehaviour, IInteractable
 
     private IEnumerator WinSequence()
 {
-    // 1. Wait just enough time for the door to finish swinging open
-    // (Adjust 1.0f to match the length of your animation)
+  
     yield return new WaitForSeconds(1.0f);
 
     if (animator != null)
